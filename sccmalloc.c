@@ -86,14 +86,21 @@ void SCCInit(unsigned char size)
   if (cache < 0) {
 	 printf("Opening /dev/rckdcm failed!\n");
   }
-  local = mmap(NULL, local_pages * PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, cache, LOCAL_LUT << 24);
+
+  unsigned int *nkAddr = 2572472320;
+  
+  //local = mmap(NULL, local_pages * PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, cache, LOCAL_LUT << 24);
+  local = mmap((void*)nkAddr, local_pages * PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FIXED, cache, LOCAL_LUT << 24);
   if (local == NULL) printf("Couldn't map memory!");
+
+	printf("nkAddr:		%p\n",nkAddr);
+	printf("local:		%p\n",local);
 
   remote = mmap(NULL, remote_pages * PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, cache, REMOTE_LUT << 24);
   if (remote == NULL) printf("Couldn't map memory!");
 	//printf("\n\nlocal_pages * PAGE_SIZE = (%d * %d) = %d \n\n",local_pages,PAGE_SIZE,(local_pages*PAGE_SIZE));
 	shmem_start_address = (uintptr_t)local;
-  freeList = local;
+  freeList = local+0x10;
   freeList->hdr.next = freeList;
   freeList->hdr.size = (size * PAGE_SIZE) / sizeof(block_t);
 
